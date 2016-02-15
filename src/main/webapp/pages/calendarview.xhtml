@@ -11,10 +11,13 @@
 		<f:metadata>
 			<f:viewAction actionListener="#{calendarBean.loadSchedule}" />
 		</f:metadata>
-
-		<h3 class="hardblue TexAlCenter">Horario de Actividades</h3>
-		<h:form id="scheduleForm">
-		<div class="EmptyBox10"></div>
+			
+		<p:tabView id="tabs">
+			<p:tab title="Horario de Actividades" id="tabSchedule">
+			<h:form id="scheduleForm">
+				<p:commandButton ajax="false" value="Imprimir">
+					<p:printer target="schedule"/>
+				</p:commandButton>
 			<p:schedule id="schedule" value="#{calendarBean.model}" timeZone="GMT-5"
 				 showHeader="false" tooltip="true" minTime="09:00:00" maxTime="20:00:00"
 				showWeekNumbers="false" allDaySlot="false" draggable="false" resizable="false"
@@ -25,7 +28,7 @@
 					update="eventDetails" oncomplete="PF('eventDialog').show();" />
 			</p:schedule>
 		<div class="EmptyBox30"></div>
-			<p:dialog widgetVar="eventDialog" header="Detalle de Actividad" showEffect="clip" hideEffect="clip">
+			<p:dialog widgetVar="eventDialog" header="Detalle de Horario" showEffect="clip" hideEffect="clip">
         <h:panelGrid id="eventDetails" columns="2">
             <p:outputLabel for="title" value="Actividad:" />
             <p:inputText id="title" value="#{calendarBean.event.title}" required="true" />
@@ -41,8 +44,37 @@
              oncomplete="PF('scheduleWidget').update();PF('eventDialog').hide();" />
         </h:panelGrid>
     </p:dialog>   
-		</h:form>
-		<div class="EmptyBox30"></div>
+    		</h:form>
+			</p:tab>
+			<p:tab title="Citas/Tareas" id="tabTask">
+			<h:form id="taskForm">
+			<p:commandButton ajax="false" value="Imprimir">
+					<p:printer target="task"/>
+				</p:commandButton>
+				<p:schedule id="task" timeZone="GMT-5" showHeader="true" tooltip="true" draggable="false" resizable="false"
+				value="#{calendarBean.modelTask}" view="month" widgetVar="taskWidget" rightHeaderTemplate="blank">
+					<p:ajax event="dateSelect" listener="#{calendarBean.onDateTaskSelect}"
+					update="taskDetails" oncomplete="PF('taskDialog').show();" />
+				<p:ajax event="eventSelect" listener="#{calendarBean.onTaskSelect}"
+					update="taskDetails" oncomplete="PF('taskDialog').show();" />
+				</p:schedule>
+				<div class="EmptyBox30"></div>
+			<p:dialog widgetVar="taskDialog" header="Detalle de Cita" showEffect="clip" hideEffect="clip">
+        <h:panelGrid id="taskDetails" columns="2">
+            <p:outputLabel for="titleTask" value="Resumen:" />
+            <p:inputText id="titleTask" value="#{calendarBean.task.title}" required="true" />
+            <p:outputLabel for="fromTask" value="From:" />
+            <p:calendar id="fromTask" value="#{calendarBean.task.startDate}" timeZone="GMT-5" pattern="dd/MM/yyyy HH:mm"/>
+            <p:outputLabel for="toTask" value="To:" />
+            <p:calendar id="toTask" value="#{calendarBean.task.endDate}"  timeZone="GMT-5" pattern="dd/MM/yyyy HH:mm"/>
+             <p:commandButton type="reset" value="Reset" />
+            <p:commandButton id="addTask" value="Guardar" actionListener="#{calendarBean.addTask}"
+             oncomplete="PF('taskWidget').update();PF('taskDialog').hide();" />
+        </h:panelGrid>
+    </p:dialog>
+    </h:form>
+			</p:tab>
+		</p:tabView>
 	</ui:define>
 
 </ui:composition>

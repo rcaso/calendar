@@ -1,7 +1,7 @@
 package com.shava.business.schedule.entity;
 
 import java.io.Serializable;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class Task implements Serializable {
 
@@ -14,9 +14,9 @@ public class Task implements Serializable {
 	
 	private String description;
 	
-	private LocalDate initialDate;
+	private LocalDateTime initialDate;
 	
-	private LocalDate finalDate;
+	private LocalDateTime finalDate;
 	
 	private String doctorName;
 	
@@ -38,19 +38,19 @@ public class Task implements Serializable {
 		this.description = description;
 	}
 
-	public LocalDate getInitialDate() {
+	public LocalDateTime getInitialDate() {
 		return initialDate;
 	}
 
-	public void setInitialDate(LocalDate initialDate) {
+	public void setInitialDate(LocalDateTime initialDate) {
 		this.initialDate = initialDate;
 	}
 
-	public LocalDate getFinalDate() {
+	public LocalDateTime getFinalDate() {
 		return finalDate;
 	}
 
-	public void setFinalDate(LocalDate finalDate) {
+	public void setFinalDate(LocalDateTime finalDate) {
 		this.finalDate = finalDate;
 	}
 

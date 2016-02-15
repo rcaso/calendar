@@ -24,6 +24,7 @@ import com.shava.business.schedule.boundary.CalendarManaged;
 import com.shava.business.schedule.control.DateUtils;
 import com.shava.business.schedule.entity.CalendarType;
 import com.shava.business.schedule.entity.Schedule;
+import com.shava.business.schedule.entity.Task;
 import com.shava.business.schedule.entity.User;
 import com.shava.business.security.entity.UserInfo;
 
@@ -46,9 +47,11 @@ public class CalendarBean implements Serializable {
 
 	private ScheduleModel model;
 	
-	private ScheduleModel modelSchedule;
+	private ScheduleModel modelTask;
 
 	private DefaultScheduleEvent event = new DefaultScheduleEvent();
+	
+	private DefaultScheduleEvent task = new DefaultScheduleEvent();
 
 	public void addEvent(ActionEvent actionEvent) {
 		LocalDateTime starTime = DateUtils.asLocalDateTime(event.getStartDate());
@@ -57,6 +60,47 @@ public class CalendarBean implements Serializable {
 			user.setSchedules(new ArrayList<>());
 		}
 		createSchedule(user.getSchedules(), event, starTime.getDayOfWeek().getValue(), starTime, endTime);
+	}
+	
+	public void addTask(ActionEvent event){
+		LocalDateTime starTime = DateUtils.asLocalDateTime(task.getStartDate());
+		LocalDateTime endTime = DateUtils.asLocalDateTime(task.getEndDate());
+		try{
+			if(user.getTasks()==null){
+				user.setTasks(new ArrayList<>());
+			}
+			if(task.getId()==null){
+				Task taskUser = new Task();
+				taskUser.setDescription(task.getTitle());
+				taskUser.setCalendarType(CalendarType.TASK.getCode());
+				taskUser.setInitialDate(starTime);
+				taskUser.setFinalDate(endTime);
+				taskUser.setId(starTime.toString());
+				user.getTasks().add(taskUser);
+				calendarManaged.updateCalendar(user);
+				task.setData(starTime.toString());
+				task.setDescription(task.getTitle());
+				modelTask.addEvent(task);
+			} else {
+				for(Task taskUser : user.getTasks()){
+					if(taskUser.getId().equals(task.getData().toString())){
+						taskUser.setInitialDate(starTime);
+						taskUser.setFinalDate(endTime);
+						taskUser.setId(starTime.toString());
+						taskUser.setDescription(task.getTitle());
+						calendarManaged.updateCalendar(user);
+						task.setData(starTime.toString());
+						task.setDescription(task.getTitle());
+						modelTask.addEvent(task);
+						break;
+					}
+				}
+			}
+			task = new DefaultScheduleEvent();
+		}catch(Exception ex){
+			ex.printStackTrace();
+		}
+		
 	}
 
 	private void createSchedule(List<Schedule> schedules, DefaultScheduleEvent event, int day, LocalDateTime starTime,
@@ -101,15 +145,38 @@ public class CalendarBean implements Serializable {
 	public void onDateSelect(SelectEvent selectEvent) {
 		event = new DefaultScheduleEvent("", (Date) selectEvent.getObject(), (Date) selectEvent.getObject());
 	}
+	
+	public void onTaskSelect(SelectEvent selectEvent) {
+		task = (DefaultScheduleEvent) selectEvent.getObject();
+	}
+
+	public void onDateTaskSelect(SelectEvent selectEvent) {
+		task = new DefaultScheduleEvent("", (Date) selectEvent.getObject(), (Date) selectEvent.getObject());
+	}
 
 	public void loadSchedule() {
 		try {
 			user = calendarManaged.loadSchedule(userInfo.getId());
 			userInfo.setName(user.getName()+" "+user.getLastName());
 			model = createCalendar(user);
+			modelTask = createTask(user);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
+	}
+
+	private ScheduleModel createTask(User userTask) {
+		DefaultScheduleModel task = new DefaultScheduleModel();
+		if(user.getTasks()!=null && !user.getTasks().isEmpty()){
+			for(Task taskDay : user.getTasks()){
+				DefaultScheduleEvent defaultTask = new DefaultScheduleEvent(taskDay.getDescription()
+						, DateUtils.asDate(taskDay.getInitialDate()), DateUtils.asDate(taskDay.getFinalDate()));
+				defaultTask.setData(taskDay.getId());
+				defaultTask.setDescription(taskDay.getDescription());
+				task.addEvent(defaultTask);
+			}
+		}
+		return task;
 	}
 
 	private DefaultScheduleModel createCalendar(User user) {
@@ -197,12 +264,20 @@ public class CalendarBean implements Serializable {
 		this.event = event;
 	}
 
-	public ScheduleModel getModelSchedule() {
-		return modelSchedule;
+	public ScheduleModel getModelTask() {
+		return modelTask;
 	}
 
-	public void setModelSchedule(ScheduleModel modelSchedule) {
-		this.modelSchedule = modelSchedule;
+	public void setModelTask(ScheduleModel modelSchedule) {
+		this.modelTask = modelSchedule;
+	}
+
+	public DefaultScheduleEvent getTask() {
+		return task;
+	}
+
+	public void setTask(DefaultScheduleEvent task) {
+		this.task = task;
 	}
 
 }
