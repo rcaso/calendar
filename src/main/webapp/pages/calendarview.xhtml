@@ -1,0 +1,48 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="content">
+		<h:outputScript name="jquery/jquery.js" library="primefaces"
+			target="head" />
+
+		<f:metadata>
+			<f:viewAction actionListener="#{calendarBean.loadSchedule}" />
+		</f:metadata>
+
+		<h3 class="hardblue TexAlCenter">Horario de Actividades</h3>
+		<h:form id="scheduleForm">
+		<div class="EmptyBox10"></div>
+			<p:schedule id="schedule" value="#{calendarBean.model}" timeZone="GMT-5"
+				 showHeader="false" tooltip="true" minTime="09:00:00" maxTime="20:00:00"
+				showWeekNumbers="false" allDaySlot="false" draggable="false" resizable="false"
+				widgetVar="scheduleWidget" view="agendaWeek">
+				<p:ajax event="dateSelect" listener="#{calendarBean.onDateSelect}"
+					update="eventDetails" oncomplete="PF('eventDialog').show();" />
+				<p:ajax event="eventSelect" listener="#{calendarBean.onEventSelect}"
+					update="eventDetails" oncomplete="PF('eventDialog').show();" />
+			</p:schedule>
+		<div class="EmptyBox30"></div>
+			<p:dialog widgetVar="eventDialog" header="Detalle de Actividad" showEffect="clip" hideEffect="clip">
+        <h:panelGrid id="eventDetails" columns="2">
+            <p:outputLabel for="title" value="Actividad:" />
+            <p:inputText id="title" value="#{calendarBean.event.title}" required="true" />
+ 
+            <p:outputLabel for="from" value="From:" />
+            <p:calendar id="from" value="#{calendarBean.event.startDate}" timeZone="GMT-5" pattern="dd/MM/yyyy HH:mm"/>
+ 
+            <p:outputLabel for="to" value="To:" />
+            <p:calendar id="to" value="#{calendarBean.event.endDate}"  timeZone="GMT-5" pattern="dd/MM/yyyy HH:mm"/>
+ 
+             <p:commandButton type="reset" value="Reset" />
+            <p:commandButton id="addButton" value="Guardar" actionListener="#{calendarBean.addEvent}"
+             oncomplete="PF('scheduleWidget').update();PF('eventDialog').hide();" />
+        </h:panelGrid>
+    </p:dialog>   
+		</h:form>
+		<div class="EmptyBox30"></div>
+	</ui:define>
+
+</ui:composition>
