@@ -30,7 +30,7 @@ public class User implements Serializable {
 	
 	private List<String> actividades;
 	
-	private List<Task> task;
+	private List<Task> tasks;
 	
 	private List<Schedule> schedules;
 	
@@ -91,12 +91,12 @@ public class User implements Serializable {
 		this.actividades = actividades;
 	}
 
-	public List<Task> getTask() {
-		return task;
+	public List<Task> getTasks() {
+		return tasks;
 	}
 
-	public void setTask(List<Task> task) {
-		this.task = task;
+	public void setTasks(List<Task> task) {
+		this.tasks = task;
 	}
 
 	public List<Schedule> getSchedules() {
