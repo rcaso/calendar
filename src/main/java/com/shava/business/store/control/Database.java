@@ -53,7 +53,7 @@ public class Database {
         if (null == cluster) {
 //            cluster = CouchbaseCluster.create("192.168.99.100");
 //            cluster = CouchbaseCluster.create(System.getenv("COUCHBASE_URI"));
-            cluster = CouchbaseCluster.create();
+            cluster = CouchbaseCluster.create("nosql.database.com");
         }
         return cluster;
     }
